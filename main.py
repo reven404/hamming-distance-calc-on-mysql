@@ -54,7 +54,7 @@ PRIMARY KEY (`id`)
     print('end creating table')
     print('begin insertion')
     with closing(conn.cursor()) as cur:
-        for val in randomGenerator(int(1e6), int(1e4)):
+        for val in randomGenerator(int(1e7), int(1e4)):
             cur.executemany('INSERT INTO `phash` (hash) VALUES (%s)', val)
             conn.commit()
     print('end insertion')
