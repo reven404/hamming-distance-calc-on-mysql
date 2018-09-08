@@ -37,23 +37,24 @@ def init(conn):
     print('begin initialization')
     print('begin creating table')
     with closing(conn.cursor()) as cur:
-        cur.execute('DROP TABLE IF EXISTS `phash`')
+        cur.execute('DROP TABLE IF EXISTS `hamming`')
+        cur.execute('DROP TABLE IF EXISTS `hamming`')
         conn.commit()
         cur.execute('''
-CREATE TABLE `phash` (
+CREATE TABLE `hamming` (
 `hash` BIT(64) NOT NULL,
 `creation_time` datetime DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (`hash`)
 ) ENGINE=InnoDB
         ''')
         conn.commit()
-        cur.execute('DELETE FROM `phash`')
+        cur.execute('DELETE FROM `hamming`')
         conn.commit()
     print('end creating table')
     print('begin insertion')
     with closing(conn.cursor()) as cur:
         for val in randomGenerator(int(1_000_000), int(10_000)):
-            cur.executemany('INSERT INTO `phash` (hash) VALUES (%s)', val)
+            cur.executemany('INSERT INTO `hamming` (hash) VALUES (%s)', val)
             conn.commit()
     print('end insertion')
     print('end initialization')
@@ -63,7 +64,7 @@ def measure(conn):
     with closing(conn.cursor()) as cur:
         for i in range(10):
             start = time.time()
-            cur.execute('SELECT SQL_NO_CACHE diff FROM (SELECT BIT_COUNT(9709740330175651432 ^ hash) AS diff FROM phash) naruhodo ORDER BY diff DESC LIMIT 10;')
+            cur.execute('SELECT SQL_NO_CACHE diff FROM (SELECT BIT_COUNT(9709740330175651432 ^ hash) AS diff FROM hamming) naruhodo ORDER BY diff DESC LIMIT 10;')
             elapsed_time = time.time() - start
             l.append(elapsed_time)
             print(f"{elapsed_time}")
