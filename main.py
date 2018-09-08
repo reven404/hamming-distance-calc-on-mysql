@@ -5,8 +5,6 @@ import os
 import time
 from statistics import mean, median
 
-MAX_INT = 2**64
-
 def getDBConnection() -> mysql.connector.connection.MySQLConnection:
     conn = mysql.connector.connect(
         host = os.getenv("MYSQL_HOST"),
@@ -43,9 +41,9 @@ def init(conn):
         conn.commit()
         cur.execute('''
 CREATE TABLE `phash` (
-`id` bigint(20) NOT NULL AUTO_INCREMENT,
-`hash` bigint(20) unsigned NOT NULL,
-PRIMARY KEY (`id`)
+`hash` BIT(64) NOT NULL,
+`creation_time` datetime DEFAULT CURRENT_TIMESTAMP,
+PRIMARY KEY (`hash`)
 ) ENGINE=InnoDB
         ''')
         conn.commit()
@@ -54,7 +52,7 @@ PRIMARY KEY (`id`)
     print('end creating table')
     print('begin insertion')
     with closing(conn.cursor()) as cur:
-        for val in randomGenerator(int(1e7), int(1e4)):
+        for val in randomGenerator(int(1_000_000), int(10_000)):
             cur.executemany('INSERT INTO `phash` (hash) VALUES (%s)', val)
             conn.commit()
     print('end insertion')
